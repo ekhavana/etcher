@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as electron from 'electron';
 import * as sdk from 'etcher-sdk';
 import * as _ from 'lodash';
 
@@ -44,7 +45,9 @@ export function isFlashing(): boolean {
  * The flag is used to signify that we're going to
  * start a flash process.
  */
-export function setFlashingFlag() {
+export async function setFlashingFlag() {
+	// see https://github.com/balenablocks/balena-electron-env/blob/4fce9c461f294d4a768db8f247eea6f75d7b08b0/README.md#remote-methods
+	await electron.ipcRenderer.send('disable-screensaver');
 	store.dispatch({
 		type: Actions.SET_FLASHING_FLAG,
 		data: {},
@@ -57,7 +60,7 @@ export function setFlashingFlag() {
  * @description
  * The flag is used to signify that the write process ended.
  */
-export function unsetFlashingFlag(results: {
+export async function unsetFlashingFlag(results: {
 	cancelled?: boolean;
 	sourceChecksum?: string;
 	errorCode?: string | number;
@@ -66,6 +69,8 @@ export function unsetFlashingFlag(results: {
 		type: Actions.UNSET_FLASHING_FLAG,
 		data: results,
 	});
+	// see https://github.com/balenablocks/balena-electron-env/blob/4fce9c461f294d4a768db8f247eea6f75d7b08b0/README.md#remote-methods
+	await electron.ipcRenderer.send('enable-screensaver');
 }
 
 export function setDevicePaths(devicePaths: string[]) {
